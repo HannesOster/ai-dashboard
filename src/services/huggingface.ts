@@ -6,6 +6,23 @@ const API_URL =
 const API_KEY = import.meta.env.VITE_HUGGINGFACE_API_KEY || "";
 // Create HF inference client (supports both InferenceClient and HfInference exports)
 const hfClient = new HfInference(import.meta.env.VITE_HUGGINGFACE_API_KEY!);
+// Typed response shapes (unions) for simple narrowing without helpers
+type HFSummarization =
+  | { summary_text: string }
+  | { summary_text: string }[]
+  | string;
+type HFTranslation =
+  | { translation_text: string }
+  | { translation_text: string }[]
+  | string;
+type HFGeneratedArray = Array<{
+  generated_text?: string;
+  translation_text?: string;
+}>;
+type HFText2Text =
+  | { generated_text: string }
+  | { generated_text: string }[]
+  | string;
 
 const createPrompt = (text: string, functionType: FunctionType): string => {
   switch (functionType) {
@@ -42,18 +59,40 @@ export const generateText = async (
         provider: "auto",
       });
 
-      if (typeof result === "string") return result;
-      if (
-        Array.isArray(result) &&
-        result.length > 0 &&
-        (result as any)[0]?.summary_text
-      ) {
-        return (result as any)[0].summary_text as string;
-      }
-      if ((result as any)?.summary_text) {
-        return (result as any).summary_text as string;
-      }
-      return JSON.stringify(result);
+      const r = result as HFSummarization;
+      if (typeof r === "string") return r;
+      if (Array.isArray(r)) return r.map((x) => x.summary_text).join("\n\n");
+      return r.summary_text;
+    }
+
+    // Use dedicated model for German -> English translation
+    if (functionType === "translate") {
+      const result = await hfClient.translation({
+        model: "Helsinki-NLP/opus-mt-de-en",
+        inputs: inputText,
+        provider: "hf-inference",
+      });
+
+      const tr = result as HFTranslation;
+      if (typeof tr === "string") return tr;
+      if (Array.isArray(tr))
+        return tr.map((x) => x.translation_text).join("\n");
+      return tr.translation_text;
+    }
+
+    // Use T5-small for paraphrasing (text-generation with paraphrase prompt)
+    if (functionType === "rewrite") {
+      const result = await hfClient.textGeneration({
+        model: "google-t5/t5-small",
+        inputs: `paraphrase: ${inputText}`,
+        provider: "hf-inference",
+      });
+
+      const tt = result as HFText2Text;
+      if (typeof tt === "string") return tt;
+      if (Array.isArray(tt))
+        return tt.map((x) => x.generated_text).join("\n\n");
+      return tt.generated_text;
     }
 
     const response = await fetch(API_URL, {
@@ -82,14 +121,15 @@ export const generateText = async (
       );
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as HFGeneratedArray | string;
 
-    // Hugging Face API returns an array with generated text
-    if (Array.isArray(data) && data.length > 0) {
-      return data[0].generated_text || data[0].translation_text || "";
+    // Hugging Face API returns an array with generated or translation text
+    if (Array.isArray(data)) {
+      const first = data.find((i) => i.generated_text || i.translation_text);
+      if (first) return first.generated_text ?? first.translation_text ?? "";
     }
 
-    return JSON.stringify(data);
+    return typeof data === "string" ? data : JSON.stringify(data);
   } catch (error) {
     console.error("Error calling Hugging Face API:", error);
     throw error;
