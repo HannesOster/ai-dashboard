@@ -1,15 +1,11 @@
-// @ts-nocheck
 import { type FunctionType } from "../store/useAppStore";
-import * as HF from "@huggingface/inference";
+import { HfInference } from "@huggingface/inference";
 
 const API_URL =
   "https://api-inference.huggingface.co/models/google/flan-t5-small?wait_for_model=true";
 const API_KEY = import.meta.env.VITE_HUGGINGFACE_API_KEY || "";
 // Create HF inference client (supports both InferenceClient and HfInference exports)
-const hfClient: any =
-  HF && (HF as any).InferenceClient
-    ? new (HF as any).InferenceClient(API_KEY)
-    : new (HF as any).HfInference(API_KEY);
+const hfClient = new HfInference(import.meta.env.VITE_HUGGINGFACE_API_KEY!);
 
 const createPrompt = (text: string, functionType: FunctionType): string => {
   switch (functionType) {

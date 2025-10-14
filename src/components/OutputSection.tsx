@@ -17,13 +17,13 @@ const OutputSection = () => {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-slate-300">
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
           Output
         </label>
         {outputText && (
           <button
             onClick={handleCopy}
-            className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
+            className="text-sm text-purple-700 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 flex items-center gap-1"
           >
             {copied ? (
               <>
@@ -41,13 +41,13 @@ const OutputSection = () => {
       </div>
 
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg flex items-start gap-2 text-red-400">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2 text-red-700 dark:bg-red-500/10 dark:border-red-500/50 dark:text-red-400">
           <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
           <p className="text-sm">{error}</p>
         </div>
       )}
 
-      <div className="w-full min-h-40 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-100">
+      <div className="w-full min-h-40 px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 shadow-sm dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
         {outputText ? (
           <p className="whitespace-pre-wrap">{outputText}</p>
         ) : (

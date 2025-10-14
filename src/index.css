@@ -1,3 +1,6 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,8 +9,6 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -17,6 +18,9 @@
 body {
   margin: 0;
   min-height: 100vh;
+}
+
+.dark body {
   background-color: #0f172a;
   color: #e2e8f0;
 }

@@ -33,7 +33,7 @@ const FunctionSelector = () => {
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-slate-300">
+      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
         Select Function
       </label>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -43,23 +43,27 @@ const FunctionSelector = () => {
             onClick={() => setSelectedFunction(func.value)}
             className={`p-4 rounded-lg border-2 transition-all text-left ${
               selectedFunction === func.value
-                ? "border-purple-500 bg-purple-500/10"
-                : "border-slate-700 bg-slate-800 hover:border-slate-600"
+                ? "border-purple-500 bg-purple-100 dark:bg-purple-500/10"
+                : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
             }`}
           >
             <div className="flex items-center gap-2 mb-2">
               <div
                 className={
                   selectedFunction === func.value
-                    ? "text-purple-400"
-                    : "text-slate-400"
+                    ? "text-purple-600 dark:text-purple-400"
+                    : "text-slate-500 dark:text-slate-400"
                 }
               >
                 {func.icon}
               </div>
-              <span className="font-semibold text-slate-100">{func.label}</span>
+              <span className="font-semibold text-slate-900 dark:text-slate-100">
+                {func.label}
+              </span>
             </div>
-            <p className="text-sm text-slate-400">{func.description}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              {func.description}
+            </p>
           </button>
         ))}
       </div>
