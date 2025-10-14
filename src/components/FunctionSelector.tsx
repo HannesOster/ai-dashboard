@@ -1,4 +1,5 @@
-import { useAppStore, FunctionType } from "../store/useAppStore";
+import type { JSX } from "react";
+import { useAppStore, type FunctionType } from "../store/useAppStore";
 import { FileText, Languages, RefreshCw } from "lucide-react";
 
 const functions: {
